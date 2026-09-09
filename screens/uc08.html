@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"/><style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#1a56db;--blue-l:#e8f0fe;--yellow:#c27803;--yellow-l:#fffbeb;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g500:#6b7280;--g700:#374151;--g900:#111827}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;min-height:100vh}
+.modal{background:#fff;border-radius:12px;width:600px;max-width:96vw;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.mhdr{padding:20px 24px 16px;border-bottom:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center}
+.mhdr h3{font-size:16px;font-weight:600}
+.mclose{width:28px;height:28px;border-radius:6px;background:var(--g100);display:flex;align-items:center;justify-content:center;color:var(--g500);font-size:16px}
+.mbody{padding:20px 24px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.field .label{font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.field .val{font-size:14px;color:var(--g900)}
+.field .empty{color:var(--g300);font-style:italic}
+.divider{border:none;border-top:1px solid var(--g100);margin:14px 0}
+.sec{font-size:12px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.warn-banner{background:var(--yellow-l);border:1px solid #fcd34d;border-radius:6px;padding:10px 14px;font-size:13px;color:var(--yellow);margin-bottom:12px;display:flex;gap:8px}
+.options{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid var(--g200);border-radius:6px;cursor:pointer}
+.opt.sel{border-color:var(--blue);background:var(--blue-l)}
+.opt input[type=radio]{accent-color:var(--blue);margin-top:2px}
+.opt-code{font-size:13px;font-weight:700;color:var(--blue)}
+.opt-name{font-size:13px;color:var(--g700);margin-top:1px}
+.rec{font-size:10px;font-weight:700;background:var(--blue);color:#fff;padding:1px 6px;border-radius:10px;margin-left:6px}
+.analog{padding:12px 16px;border-radius:6px;font-size:14px;font-weight:500;display:flex;gap:8px;align-items:center;margin-top:4px;background:var(--yellow-l);color:var(--yellow)}
+.srcref{margin-top:12px;font-size:12px;color:var(--g500)}
+.mftr{padding:16px 24px;border-top:1px solid var(--g200);display:flex;gap:10px;justify-content:flex-end}
+.btn{padding:9px 20px;border-radius:6px;font-size:14px;font-weight:600;border:none;cursor:pointer}
+.btn-p{background:var(--blue);color:#fff}
+.btn-s{background:#fff;color:var(--g700);border:1px solid var(--g300)}
+</style></head><body>
+<div class="modal">
+  <div class="mhdr"><h3>Шуруп ⚠</h3><div class="mclose">✕</div></div>
+  <div class="mbody">
+    <div class="fgrid">
+      <div class="field"><div class="label">Количество</div><div class="val">1 000 шт</div></div>
+      <div class="field"><div class="label">Единица измерения</div><div class="val">шт</div></div>
+      <div class="field"><div class="label">Характеристики</div><div class="val empty">не указано</div></div>
+      <div class="field"><div class="label">ГОСТ / Маркировка</div><div class="val empty">не указано</div></div>
+    </div>
+    <hr class="divider"/>
+    <div class="sec">Код АГСК</div>
+    <div class="warn-banner">⚠ Товар описан без характеристик. Код не может быть определён однозначно. Выберите подходящий из предложенных вариантов.</div>
+    <div class="options">
+      <label class="opt sel"><input type="radio" name="agsk" checked><div><div class="opt-code">25.94.11.100<span class="rec">рекомендован</span></div><div class="opt-name">Шурупы самонарезающие стальные общего назначения</div></div></label>
+      <label class="opt"><input type="radio" name="agsk"><div><div class="opt-code">25.94.11.200</div><div class="opt-name">Шурупы кровельные с уплотнительной шайбой</div></div></label>
+      <label class="opt"><input type="radio" name="agsk"><div><div class="opt-code">25.94.11.300</div><div class="opt-name">Шурупы мебельные конфирмат (Евровинт)</div></div></label>
+      <label class="opt"><input type="radio" name="agsk"><div><div class="opt-code">25.94.11.400</div><div class="opt-name">Шурупы универсальные, жёлтый цинк</div></div></label>
+      <label class="opt"><input type="radio" name="agsk"><div><div class="opt-code">25.94.11.500</div><div class="opt-name">Шурупы анкерные по бетону</div></div></label>
+    </div>
+    <hr class="divider"/>
+    <div class="sec">Отечественный аналог</div>
+    <div class="analog">⚠ Требует проверки — выберите код АГСК для уточнения статуса</div>
+    <div class="srcref">📍 Источник: строка 312, страница 14 исходного документа</div>
+  </div>
+  <div class="mftr">
+    <button class="btn btn-p">Сохранить выбор</button>
+    <button class="btn btn-s">Закрыть</button>
+  </div>
+</div>
+</body></html>

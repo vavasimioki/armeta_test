@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"/><style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#1a56db;--green:#0e9f6e;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g500:#6b7280;--g700:#374151;--g900:#111827}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--g50);min-height:100vh}
+nav{background:#fff;border-bottom:1px solid var(--g200);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{width:32px;height:32px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+.nav-title{font-weight:600;font-size:15px}
+.nav-ver{font-size:11px;color:var(--g500);background:var(--g100);padding:2px 8px;border-radius:20px}
+.wrap{max-width:580px;margin:60px auto;padding:0 24px}
+.card{background:#fff;border:1px solid var(--g200);border-radius:12px;padding:32px;box-shadow:0 4px 6px rgba(0,0,0,.07)}
+.card h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.fname{font-size:13px;color:var(--g500);margin-bottom:28px}
+.steps{display:flex;flex-direction:column;gap:16px}
+.step{display:flex;align-items:flex-start;gap:14px}
+.icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px}
+.icon.done{background:var(--green);color:#fff}
+.icon.active{background:var(--blue);color:#fff}
+.icon.pend{background:var(--g200);color:var(--g500)}
+.label{font-size:14px;font-weight:500}
+.sub{font-size:12px;color:var(--g500);margin-top:2px}
+.bar{margin-top:8px;background:var(--g100);border-radius:20px;height:6px;overflow:hidden;width:100%}
+.fill{height:100%;background:var(--blue);border-radius:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.note{margin-top:28px;font-size:13px;color:var(--g500);text-align:center;padding-top:20px;border-top:1px solid var(--g100)}
+</style></head><body>
+<nav><div class="nav-brand"><div class="nav-logo">КЗ</div><span class="nav-title">КЗ-Анализ Смет</span></div><span class="nav-ver">v1.0-pilot</span></nav>
+<div class="wrap"><div class="card">
+  <h2>Обработка файла</h2>
+  <p class="fname">smeta_proekt_energetika.pdf</p>
+  <div class="steps">
+    <div class="step"><div class="icon done">✓</div><div><div class="label">Файл принят</div><div class="sub">Формат определён: PDF-скан</div></div></div>
+    <div class="step"><div class="icon done">✓</div><div><div class="label">Распознавание текста (OCR)</div><div class="sub">Распознано 24 стр. · 1 предупреждение (стр. 18)</div></div></div>
+    <div class="step">
+      <div class="icon active"><div class="spinner"></div></div>
+      <div style="flex:1">
+        <div class="label">Классификация строк (товар / работа / услуга)</div>
+        <div class="sub">Анализ 847 строк...</div>
+        <div class="bar"><div class="fill" style="width:42%"></div></div>
+      </div>
+    </div>
+    <div class="step"><div class="icon pend">4</div><div><div class="label">Подбор кодов АГСК</div><div class="sub">Ожидание...</div></div></div>
+    <div class="step"><div class="icon pend">5</div><div><div class="label">Сверка с реестром отечественных производителей</div><div class="sub">Ожидание...</div></div></div>
+  </div>
+  <p class="note">Пожалуйста, не закрывайте вкладку браузера.</p>
+</div></div>
+</body></html>

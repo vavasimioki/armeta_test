@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>КЗ-Анализ Смет</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #1a56db;
+      --blue-light: #e8f0fe;
+      --blue-dark:  #1341b0;
+      --green:      #0e9f6e;
+      --green-bg:   #f0fdf4;
+      --red:        #e02424;
+      --red-bg:     #fef2f2;
+      --yellow:     #c27803;
+      --yellow-bg:  #fffbeb;
+      --gray-50:    #f9fafb;
+      --gray-100:   #f3f4f6;
+      --gray-200:   #e5e7eb;
+      --gray-300:   #d1d5db;
+      --gray-500:   #6b7280;
+      --gray-700:   #374151;
+      --gray-900:   #111827;
+      --radius:     8px;
+      --shadow:     0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md:  0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+      --shadow-lg:  0 10px 15px rgba(0,0,0,.10), 0 4px 6px rgba(0,0,0,.05);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-logo {
+      width: 32px; height: 32px;
+      background: var(--blue);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 14px;
+    }
+    .nav-title { font-weight: 600; font-size: 15px; color: var(--gray-900); }
+    .nav-version {
+      font-size: 11px; color: var(--gray-500);
+      background: var(--gray-100);
+      padding: 2px 8px; border-radius: 20px;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── UPLOAD SCREEN ── */
+    .upload-wrap {
+      max-width: 640px;
+      margin: 80px auto;
+      padding: 0 24px;
+    }
+    .upload-heading {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .upload-heading h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+    .upload-heading p { color: var(--gray-500); font-size: 15px; }
+
+    .drop-zone {
+      border: 2px dashed var(--gray-300);
+      border-radius: 12px;
+      background: #fff;
+      padding: 56px 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--blue);
+      background: var(--blue-light);
+    }
+    .drop-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .drop-zone h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .drop-zone p { color: var(--gray-500); font-size: 14px; margin-bottom: 24px; }
+    .drop-formats {
+      display: inline-flex; gap: 8px;
+      margin-top: 16px;
+    }
+    .format-tag {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-700);
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: background .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: var(--blue-dark); }
+    .btn-secondary {
+      background: #fff; color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+    }
+    .btn-secondary:hover { background: var(--gray-50); }
+    .btn-outline-blue {
+      background: transparent; color: var(--blue);
+      border: 1px solid var(--blue);
+    }
+    .btn-outline-blue:hover { background: var(--blue-light); }
+
+    .security-note {
+      margin-top: 24px;
+      background: var(--blue-light);
+      border: 1px solid #c7d7f9;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #1e40af;
+      display: flex; gap: 8px; align-items: flex-start;
+    }
+
+    /* file-chosen state */
+    .file-chosen {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 24px 28px;
+      box-shadow: var(--shadow-md);
+    }
+    .file-chosen-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .file-icon-big {
+      width: 44px; height: 44px;
+      background: var(--blue-light);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .file-info h3 { font-size: 15px; font-weight: 600; }
+    .file-info p { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+    .file-chosen-actions { display: flex; gap: 12px; }
+
+    /* ── PROGRESS SCREEN ── */
+    .progress-wrap {
+      max-width: 580px;
+      margin: 60px auto;
+      padding: 0 24px;
+    }
+    .progress-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+    }
+    .progress-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    .progress-filename { font-size: 13px; color: var(--gray-500); margin-bottom: 28px; }
+    .progress-steps { display: flex; flex-direction: column; gap: 16px; }
+    .step {
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .step-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0; margin-top: 1px;
+    }
+    .step.done .step-icon   { background: var(--green); color: #fff; }
+    .step.active .step-icon { background: var(--blue); color: #fff; }
+    .step.pending .step-icon{ background: var(--gray-200); color: var(--gray-500); }
+    .step-body { flex: 1; }
+    .step-label { font-size: 14px; font-weight: 500; }
+    .step-sub { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+    .step-bar {
+      margin-top: 8px;
+      background: var(--gray-100);
+      border-radius: 20px; height: 6px; overflow: hidden;
+    }
+    .step-bar-fill {
+      height: 100%; background: var(--blue);
+      border-radius: 20px;
+      transition: width .4s ease;
+    }
+    .progress-note {
+      margin-top: 28px;
+      font-size: 13px; color: var(--gray-500);
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    /* spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    /* ── RESULTS SCREEN ── */
+    .results-wrap { max-width: 1200px; margin: 0 auto; padding: 24px 24px; }
+
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+    }
+    .results-meta h2 { font-size: 17px; font-weight: 600; }
+    .results-meta p { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+    .results-actions { display: flex; gap: 10px; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .stat-num {
+      font-size: 28px; font-weight: 700; line-height: 1;
+    }
+    .stat-card .stat-label { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+    .stat-card.all  .stat-num { color: var(--gray-900); }
+    .stat-card.yes  .stat-num { color: var(--green); }
+    .stat-card.no   .stat-num { color: var(--red); }
+    .stat-card.warn .stat-num { color: var(--yellow); }
+
+    /* filter bar */
+    .filter-bar {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      box-shadow: var(--shadow);
+    }
+    .filter-label { font-size: 13px; font-weight: 500; color: var(--gray-500); }
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill {
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 500;
+      border: 1px solid var(--gray-300);
+      background: #fff; cursor: pointer;
+      transition: all .15s;
+    }
+    .pill.active-all  { background: var(--gray-700); color: #fff; border-color: var(--gray-700); }
+    .pill.active-yes  { background: var(--green);    color: #fff; border-color: var(--green); }
+    .pill.active-no   { background: var(--red);      color: #fff; border-color: var(--red); }
+    .pill.active-warn { background: var(--yellow);   color: #fff; border-color: var(--yellow); }
+    .search-input {
+      margin-left: auto;
+      padding: 6px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      font-size: 13px;
+      outline: none;
+      width: 220px;
+    }
+    .search-input:focus { border-color: var(--blue); }
+
+    /* table */
+    .table-wrap {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: var(--gray-50);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      border-bottom: 1px solid var(--gray-200);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th:hover { color: var(--gray-900); }
+    tbody tr {
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: background .1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--blue-light); }
+    tbody tr.warn-row { background: var(--yellow-bg); }
+    tbody tr.warn-row:hover { background: #fef3c7; }
+    td {
+      padding: 11px 14px;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+    .td-name { font-weight: 500; max-width: 220px; }
+    .td-num  { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-yes  { background: var(--green-bg); color: var(--green); }
+    .badge-no   { background: var(--red-bg);   color: var(--red); }
+    .badge-warn { background: var(--yellow-bg);color: var(--yellow); }
+
+    .agsk-multi {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 12px; background: var(--blue-light); color: var(--blue);
+      font-weight: 600;
+    }
+    .agsk-conflict {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12px; color: var(--red); font-weight: 500;
+    }
+    .flag-warn { font-size: 15px; }
+
+    .registry-banner {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--yellow);
+      margin-bottom: 16px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+
+    /* ── MODAL ── */
+    .overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      width: 600px;
+      max-width: calc(100vw - 48px);
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn .2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: translateY(12px) scale(.97); }
+      to   { opacity:1; transform: translateY(0)    scale(1); }
+    }
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 16px; font-weight: 600; }
+    .modal-close {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: var(--gray-100); border: none; cursor: pointer;
+      font-size: 16px; display: flex; align-items: center; justify-content: center;
+      color: var(--gray-500);
+    }
+    .modal-close:hover { background: var(--gray-200); }
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--gray-200);
+      display: flex; gap: 10px; justify-content: flex-end;
+    }
+
+    .field-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-bottom: 20px;
+    }
+
+    .field-label { font-size: 11px; font-weight: 600; color: var(--gray-500);
+      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+    .field-value { font-size: 14px; color: var(--gray-900); }
+    .field-value.empty { color: var(--gray-300); font-style: italic; }
+
+    .section-divider {
+      border: none; border-top: 1px solid var(--gray-100);
+      margin: 16px 0;
+    }
+    .section-title {
+      font-size: 12px; font-weight: 700; color: var(--gray-500);
+      text-transform: uppercase; letter-spacing: .07em;
+      margin-bottom: 12px;
+    }
+    .agsk-source-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 12px; padding: 10px 14px;
+      background: var(--red-bg); border-radius: var(--radius);
+      font-size: 13px; color: var(--red);
+    }
+    .agsk-options { display: flex; flex-direction: column; gap: 8px; }
+    .agsk-option {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .agsk-option:hover { border-color: var(--blue); background: var(--blue-light); }
+    .agsk-option.selected {
+      border-color: var(--blue); background: var(--blue-light);
+    }
+    .agsk-option input[type=radio] { margin-top: 2px; accent-color: var(--blue); }
+    .agsk-option-code { font-size: 13px; font-weight: 700; color: var(--blue); }
+    .agsk-option-name { font-size: 13px; color: var(--gray-700); }
+    .agsk-recommended {
+      font-size: 10px; font-weight: 700;
+      background: var(--blue); color: #fff;
+      padding: 1px 6px; border-radius: 10px; margin-left: 6px;
+    }
+
+    .analog-result {
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      font-size: 14px; font-weight: 500;
+      display: flex; gap: 10px; align-items: center;
+    }
+    .analog-yes  { background: var(--green-bg); color: var(--green); }
+    .analog-no   { background: var(--red-bg);   color: var(--red); }
+    .analog-warn { background: var(--yellow-bg);color: var(--yellow); }
+
+    .source-ref {
+      margin-top: 12px;
+      font-size: 12px; color: var(--gray-500);
+      display: flex; gap: 6px; align-items: center;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center; padding: 60px 24px;
+      color: var(--gray-500);
+    }
+    .empty-state p { font-size: 15px; margin-top: 12px; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--gray-900); color: #fff;
+      padding: 12px 20px; border-radius: var(--radius);
+      font-size: 14px; font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      z-index: 999;
+      display: none;
+      animation: toastIn .25s ease;
+    }
+    @keyframes toastIn {
+      from { opacity:0; transform: translateY(12px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* ── ERROR CARD ── */
+    .error-step {
+      background: var(--red-bg); border: 1px solid #fca5a5;
+      border-radius: var(--radius); padding: 14px 16px;
+      margin-top: 12px;
+    }
+    .error-step p { font-size: 13px; color: var(--red); margin-bottom: 12px; }
+
+    /* util */
+    .mt-8  { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .flex-center { display: flex; align-items: center; gap: 8px; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">КЗ</div>
+    <span class="nav-title">КЗ-Анализ Смет</span>
+  </div>
+  <span class="nav-version">v1.0-pilot</span>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 1 — UPLOAD
+══════════════════════════════════════════ -->
+<div id="screen-upload" class="screen active">
+  <div class="upload-wrap">
+    <div class="upload-heading">
+      <h1>Анализ строительных смет</h1>
+      <p>Загрузите файл сметы — система автоматически извлечёт товарные позиции,<br>
+         подберёт коды АГСК и проверит наличие отечественных аналогов.</p>
+    </div>
+
+    <!-- drop zone -->
+    <div class="drop-zone" id="dropZone">
+      <span class="drop-icon">📄</span>
+      <h2>Перетащите файл сюда</h2>
+      <p>или нажмите кнопку ниже</p>
+      <button class="btn btn-primary" onclick="simulateFileChosen()">
+        Выбрать файл с компьютера
+      </button>
+      <div class="drop-formats">
+        <span class="format-tag">PDF (скан)</span>
+        <span class="format-tag">PDF (машинный)</span>
+        <span class="format-tag">XML КЕНМЛ v1</span>
+        <span class="format-tag">XML КЕНМЛ v2</span>
+      </div>
+    </div>
+
+    <!-- file chosen state (hidden initially) -->
+    <div class="file-chosen hidden" id="fileChosen">
+      <div class="file-chosen-header">
+        <div class="file-icon-big">📄</div>
+        <div class="file-info">
+          <h3 id="chosenFileName">smeta_proekt_energetika.pdf</h3>
+          <p id="chosenFileMeta">4.2 МБ · PDF (скан) · Определён автоматически</p>
+        </div>
+      </div>
+      <div class="file-chosen-actions">
+        <button class="btn btn-primary" onclick="goToProgress()">
+          ▶ Анализировать
+        </button>
+        <button class="btn btn-secondary" onclick="resetUpload()">
+          Выбрать другой файл
+        </button>
+      </div>
+    </div>
+
+    <div class="security-note">
+      <span>🔒</span>
+      <span>Данные обрабатываются локально и не передаются за пределы инфраструктуры организации.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 2 — PROGRESS
+══════════════════════════════════════════ -->
+<div id="screen-progress" class="screen">
+  <div class="progress-wrap">
+    <div class="progress-card">
+      <h2>Обработка файла</h2>
+      <p class="progress-filename" id="progressFileName">smeta_proekt_energetika.pdf</p>
+
+      <div class="progress-steps" id="progressSteps">
+
+        <div class="step done" id="step1">
+          <div class="step-icon">✓</div>
+          <div class="step-body">
+            <div class="step-label">Файл принят</div>
+            <div class="step-sub">Формат определён: PDF-скан</div>
+          </div>
+        </div>
+
+        <div class="step pending" id="step2">
+          <div class="step-icon">2</div>
+          <div class="step-body">
+            <div class="step-label">Распознавание текста (OCR)</div>
+            <div class="step-sub" id="step2sub">Ожидание...</div>
+            <div class="step-bar hidden" id="step2bar">
+              <div class="step-bar-fill" id="step2fill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step pending" id="step3">
+          <div class="step-icon">3</div>
+          <div class="step-body">
+            <div class="step-label">Классификация строк (товар / работа / услуга)</div>
+            <div class="step-sub" id="step3sub">Ожидание...</div>
+            <div class="step-bar hidden" id="step3bar">
+              <div class="step-bar-fill" id="step3fill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step pending" id="step4">
+          <div class="step-icon">4</div>
+          <div class="step-body">
+            <div class="step-label">Подбор кодов АГСК</div>
+            <div class="step-sub" id="step4sub">Ожидание...</div>
+            <div class="step-bar hidden" id="step4bar">
+              <div class="step-bar-fill" id="step4fill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step pending" id="step5">
+          <div class="step-icon">5</div>
+          <div class="step-body">
+            <div class="step-label">Сверка с реестром отечественных производителей</div>
+            <div class="step-sub" id="step5sub">Ожидание...</div>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="progress-note">Пожалуйста, не закрывайте вкладку браузера.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 3 — RESULTS
+══════════════════════════════════════════ -->
+<div id="screen-results" class="screen">
+  <div class="results-wrap">
+
+    <div class="results-header">
+      <div class="results-meta">
+        <h2 id="resultFileName">📄 smeta_proekt_energetika.pdf</h2>
+        <p>Обработано: 09.09.2026 14:32 · Формат: PDF-скан</p>
+      </div>
+      <div class="results-actions">
+        <button class="btn btn-outline-blue" onclick="downloadExcel()">⬇ Скачать Excel</button>
+        <button class="btn btn-secondary" onclick="goToUpload()">＋ Новый файл</button>
+      </div>
+    </div>
+
+    <!-- stats -->
+    <div class="stats-row">
+      <div class="stat-card all">
+        <div class="stat-num">247</div>
+        <div class="stat-label">Товаров найдено</div>
+      </div>
+      <div class="stat-card yes">
+        <div class="stat-num">184</div>
+        <div class="stat-label">Есть аналог КЗ</div>
+      </div>
+      <div class="stat-card no">
+        <div class="stat-num">41</div>
+        <div class="stat-label">Нет аналога</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="stat-num">22</div>
+        <div class="stat-label">Требуют проверки</div>
+      </div>
+    </div>
+
+    <!-- registry banner -->
+    <div class="registry-banner">
+      <span>⚠</span>
+      <span>Реестр КТП/СТ-КЗ подключён в тестовом режиме. Результаты по аналогам требуют верификации.</span>
+    </div>
+
+    <!-- filter bar -->
+    <div class="filter-bar">
+      <span class="filter-label">Фильтр:</span>
+      <div class="filter-pills">
+        <span class="pill active-all" onclick="filterTable('all',this)">Все (247)</span>
+        <span class="pill" onclick="filterTable('yes',this)">✓ Есть аналог (184)</span>
+        <span class="pill" onclick="filterTable('no',this)">✗ Нет аналога (41)</span>
+        <span class="pill" onclick="filterTable('warn',this)">⚠ Требуют проверки (22)</span>
+      </div>
+      <input class="search-input" type="text" placeholder="🔍 Поиск по наименованию..." oninput="searchTable(this.value)" />
+    </div>
+
+    <!-- table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Наименование</th>
+            <th>Кол-во</th>
+            <th>Ед.</th>
+            <th>Характеристики</th>
+            <th>Код АГСК</th>
+            <th>Аналог КЗ</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty-state hidden" id="emptyState">
+        <span style="font-size:36px">🔍</span>
+        <p>Ничего не найдено. Попробуйте изменить фильтры.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL — ITEM CARD
+══════════════════════════════════════════ -->
+<div class="overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Карточка товара</h3>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="field-grid" id="modalFields"></div>
+
+      <hr class="section-divider">
+      <div class="section-title">Код АГСК</div>
+      <div id="modalAgsk"></div>
+
+      <hr class="section-divider">
+      <div class="section-title">Отечественный аналог</div>
+      <div id="modalAnalog"></div>
+
+      <div class="source-ref" id="modalSource"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveSelection()">Сохранить выбор</button>
+      <button class="btn btn-secondary" onclick="closeModalDirect()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+/* ─── DATA ─── */
+const ITEMS = [
+  { id:1,  name:'Кабель ВВГ 3х2.5',          qty:150,  unit:'м',   chars:'Сечение 3х2,5 мм², 0,66 кВ', gost:'ГОСТ 31996-2012', mark:'ВВГ нг(А)-LS', delivery:'—', docCode:'27.32.10.110', agsk:[{code:'27.32.10.110',name:'Кабели силовые с ПВХ изоляцией ВВГ, до 1 кВ',rec:true},{code:'27.32.10.112',name:'Кабели ВВГ нг(А)-LS огнестойкие',rec:false},{code:'27.32.10.115',name:'Кабели контрольные КВВГнг',rec:false}], analog:'yes',  flag:false },
+  { id:2,  name:'Трансформатор ТМГ-630',      qty:2,    unit:'шт',  chars:'630 кВА, 10/0,4 кВ, IP33',   gost:'ГОСТ 11677-85',   mark:'ТМГ-630/10/0,4', delivery:'60 дн.', docCode:'27.11.32.400', agsk:[{code:'27.11.32.400',name:'Трансформаторы силовые масляные, 630 кВА',rec:true},{code:'27.11.32.300',name:'Трансформаторы силовые 400 кВА',rec:false}], analog:'no',   flag:false },
+  { id:3,  name:'Шуруп',                       qty:1000, unit:'шт',  chars:'—',                           gost:'—',               mark:'—', delivery:'—', docCode:'—', agsk:[{code:'25.94.11.100',name:'Шурупы самонарезающие стальные',rec:true},{code:'25.94.11.200',name:'Шурупы кровельные с уплотнителем',rec:false},{code:'25.94.11.300',name:'Шурупы мебельные конфирмат',rec:false},{code:'25.94.11.400',name:'Шурупы универсальные жёлтый цинк',rec:false},{code:'25.94.11.500',name:'Шурупы по бетону анкерные',rec:false}], analog:'warn', flag:true  },
+  { id:4,  name:'Насос ЦНС 60-99',            qty:1,    unit:'шт',  chars:'Q=60 м³/ч, H=99 м, N=45 кВт', gost:'ГОСТ 22247-96',  mark:'ЦНС 60-99/5', delivery:'45 дн.', docCode:'28.13.12.210', agsk:[{code:'28.13.12.210',name:'Насосы центробежные многоступенчатые ЦНС',rec:true}], analog:'yes',  flag:false },
+  { id:5,  name:'Арматура d=25',              qty:40,   unit:'м',   chars:'d=25 мм, PN16, латунь',       gost:'—',               mark:'—', delivery:'—', docCode:'28.14.22.100', agsk:[{code:'28.14.22.100',name:'Арматура трубопроводная запорная Ду25',rec:true},{code:'28.14.22.110',name:'Вентили запорные муфтовые латунь',rec:false},{code:'28.14.22.120',name:'Кран шаровой полнопроходной Ду25',rec:false}], analog:'yes',  flag:true  },
+  { id:6,  name:'Задвижка ДУ100',             qty:6,    unit:'шт',  chars:'Ду100, PN16, чугун',           gost:'ГОСТ 9698-86',    mark:'ЗКЛ2-16ч5п', delivery:'—', docCode:'28.14.22.340', agsk:[{code:'28.14.22.340',name:'Задвижки клиновые фланцевые чугунные Ду100',rec:true}], analog:'yes',  flag:false },
+  { id:7,  name:'Щит ЩО-70-1-11',            qty:1,    unit:'шт',  chars:'IP31, 1-секц., 12 групп',     gost:'ГОСТ Р 51321.1-2000', mark:'ЩО-70-1-11У3', delivery:'—', docCode:'27.11.41.001', agsk:[{code:'27.11.40.310',name:'Щиты распределительные низковольтные IP31',rec:false},{code:'27.11.40.320',name:'Щиты учёта и распределения однофазные',rec:false},{code:'27.11.40.330',name:'Щиты осветительные ЩО серия 70',rec:true},{code:'27.11.40.410',name:'Панели распределительные напольные',rec:false},{code:'27.11.40.500',name:'Шкафы управления электроприводами',rec:false}], analog:'no',   flag:true  },
+  { id:8,  name:'Труба стальная 108х4',       qty:320,  unit:'м',   chars:'Ø108х4 мм, ст.20',            gost:'ГОСТ 8732-78',    mark:'108х4 ст.20', delivery:'—', docCode:'24.20.11.120', agsk:[{code:'24.20.11.120',name:'Трубы бесшовные горячедеформированные 108х4',rec:true}], analog:'yes',  flag:false },
+  { id:9,  name:'Краска эпоксидная',          qty:80,   unit:'кг',  chars:'—',                           gost:'—',               mark:'—', delivery:'—', docCode:'—', agsk:[{code:'20.30.12.100',name:'Краски эпоксидные двухкомпонентные',rec:true},{code:'20.30.12.200',name:'Эмали эпоксидные для металла',rec:false},{code:'20.30.12.300',name:'Грунт-эмаль эпоксидная антикоррозионная',rec:false},{code:'20.30.12.400',name:'Краски водно-дисперсионные акриловые',rec:false}], analog:'warn', flag:true  },
+  { id:10, name:'Электродвигатель 5кВт АИР',  qty:2,    unit:'шт',  chars:'5 кВт, 1000 об/мин, IP54',   gost:'ГОСТ IEC 60034-1', mark:'АИР112МВ6', delivery:'30 дн.', docCode:'27.11.40.220', agsk:[{code:'27.11.40.220',name:'Двигатели асинхронные АИР, 5 кВт',rec:true}], analog:'no',   flag:false },
+  { id:11, name:'Датчик давления',            qty:8,    unit:'шт',  chars:'0-16 бар, 4-20мА, IP65',     gost:'—',               mark:'—', delivery:'—', docCode:'—', agsk:[{code:'26.51.43.100',name:'Датчики давления электронные 0-16 бар',rec:true},{code:'26.51.43.200',name:'Манометры электроконтактные',rec:false},{code:'26.51.43.300',name:'Преобразователи давления токовые',rec:false}], analog:'warn', flag:true  },
+  { id:12, name:'Болт М16х60',               qty:200,  unit:'шт',  chars:'М16х60, кл.пр. 5.8',         gost:'ГОСТ 7798-70',    mark:'М16х60.58', delivery:'—', docCode:'25.94.12.100', agsk:[{code:'25.94.12.100',name:'Болты с шестигранной головкой М16',rec:true}], analog:'yes',  flag:false },
+];
+
+let currentFilter = 'all';
+let currentSearch = '';
+let selectedCodes = {};
+
+/* ─── SCREEN TRANSITIONS ─── */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function simulateFileChosen() {
+  document.getElementById('dropZone').classList.add('hidden');
+  document.getElementById('fileChosen').classList.remove('hidden');
+}
+
+function resetUpload() {
+  document.getElementById('dropZone').classList.remove('hidden');
+  document.getElementById('fileChosen').classList.add('hidden');
+}
+
+function goToUpload() {
+  resetUpload();
+  showScreen('upload');
+}
+
+function goToProgress() {
+  showScreen('progress');
+  runProgress();
+}
+
+/* ─── PROGRESS SIMULATION ─── */
+function setStep(n, state, sub) {
+  const el = document.getElementById('step' + n);
+  el.className = 'step ' + state;
+  const icon = el.querySelector('.step-icon');
+  if (state === 'done')   icon.textContent = '✓';
+  else if (state === 'active') icon.innerHTML = '<div class="spinner"></div>';
+  else icon.textContent = n;
+  if (sub) document.getElementById('step' + n + 'sub').textContent = sub;
+}
+
+function animateBar(fillId, barId, duration, cb) {
+  document.getElementById(barId).classList.remove('hidden');
+  const fill = document.getElementById(fillId);
+  let pct = 0;
+  const interval = setInterval(() => {
+    pct += Math.random() * 18 + 4;
+    if (pct >= 100) { pct = 100; clearInterval(interval); setTimeout(cb, 200); }
+    fill.style.width = pct + '%';
+  }, duration / 15);
+}
+
+function runProgress() {
+  // step 2
+  setTimeout(() => {
+    setStep(2, 'active', 'Распознавание страниц...');
+    animateBar('step2fill', 'step2bar', 2500, () => {
+      setStep(2, 'done', 'Распознано 24 стр. · 1 предупреждение (стр.18)');
+      // step 3
+      setTimeout(() => {
+        setStep(3, 'active', 'Анализ 847 строк...');
+        animateBar('step3fill', 'step3bar', 1800, () => {
+          setStep(3, 'done', 'Товаров: 247 · Работ: 512 · Услуг: 88');
+          // step 4
+          setTimeout(() => {
+            setStep(4, 'active', 'Семантический поиск по базе АГСК...');
+            animateBar('step4fill', 'step4bar', 2200, () => {
+              setStep(4, 'done', '247 товаров обработано · 18 требуют уточнения');
+              // step 5
+              setTimeout(() => {
+                setStep(5, 'active', 'Сверка с реестром КТП/СТ-КЗ...');
+                setTimeout(() => {
+                  setStep(5, 'done', 'Завершено · Есть: 184 · Нет: 41 · Уточнить: 22');
+                  setTimeout(() => {
+                    buildTable();
+                    showScreen('results');
+                  }, 600);
+                }, 1800);
+              }, 400);
+            });
+          }, 400);
+        });
+      }, 400);
+    });
+  }, 600);
+}
+
+/* ─── TABLE ─── */
+function buildTable() {
+  renderTable(ITEMS);
+}
+
+function filterTable(type, el) {
+  document.querySelectorAll('.filter-pills .pill').forEach(p => {
+    p.className = 'pill';
+  });
+  el.classList.add('active-' + type);
+  currentFilter = type;
+  applyFilters();
+}
+
+function searchTable(q) {
+  currentSearch = q.toLowerCase();
+  applyFilters();
+}
+
+function applyFilters() {
+  let items = ITEMS;
+  if (currentFilter !== 'all') items = items.filter(i => i.analog === currentFilter);
+  if (currentSearch) items = items.filter(i => i.name.toLowerCase().includes(currentSearch) || i.chars.toLowerCase().includes(currentSearch));
+  renderTable(items);
+}
+
+function agskDisplay(item) {
+  const chosen = selectedCodes[item.id];
+  const code = chosen || (item.docCode !== '—' ? item.docCode : null);
+  const recommended = item.agsk.find(a => a.rec);
+
+  if (item.agsk.length > 1 && !chosen) {
+    return `<span class="agsk-multi">⇄ ${item.agsk.length} вариантов</span>`;
+  }
+  if (item.docCode !== '—' && recommended && item.docCode !== recommended.code && !chosen) {
+    return `<span class="agsk-conflict">⚠ ${item.docCode}</span>`;
+  }
+  const display = chosen || (recommended ? recommended.code : item.docCode);
+  return `<span style="font-size:12px;font-weight:600;color:var(--gray-700)">${display}</span>`;
+}
+
+function analogBadge(analog) {
+  if (analog === 'yes')  return `<span class="badge badge-yes">✓ ДА</span>`;
+  if (analog === 'no')   return `<span class="badge badge-no">✗ НЕТ</span>`;
+  return `<span class="badge badge-warn">⚠ Уточнить</span>`;
+}
+
+function renderTable(items) {
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+  if (!items.length) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  tbody.innerHTML = items.map(item => `
+    <tr class="${item.flag ? 'warn-row' : ''}" onclick="openModal(${item.id})">
+      <td style="color:var(--gray-400);font-size:12px">${item.id}</td>
+      <td class="td-name">${item.name}</td>
+      <td class="td-num">${item.qty.toLocaleString('ru')}</td>
+      <td><span style="color:var(--gray-500);font-size:12px">${item.unit}</span></td>
+      <td style="font-size:12px;color:var(--gray-500);max-width:160px">${item.chars}</td>
+      <td>${agskDisplay(item)}</td>
+      <td>${analogBadge(item.analog)}</td>
+      <td>${item.flag ? '<span class="flag-warn" title="Требует проверки">⚠</span>' : ''}</td>
+    </tr>
+  `).join('');
+}
+
+/* ─── MODAL ─── */
+function openModal(id) {
+  const item = ITEMS.find(i => i.id === id);
+  document.getElementById('modalTitle').textContent = item.name;
+
+  // fields
+  const f = (label, value) => `
+    <div class="field">
+      <div class="field-label">${label}</div>
+      <div class="field-value ${value === '—' ? 'empty' : ''}">${value === '—' ? 'не указано' : value}</div>
+    </div>`;
+  document.getElementById('modalFields').innerHTML =
+    f('Наименование', item.name) +
+    f('Количество', item.qty.toLocaleString('ru') + ' ' + item.unit) +
+    f('Единица измерения', item.unit) +
+    f('Характеристики', item.chars) +
+    f('ГОСТ / Маркировка', item.gost + (item.mark !== '—' ? ' · ' + item.mark : '')) +
+    f('Срок поставки', item.delivery);
+
+  // agsk
+  const recommended = item.agsk.find(a => a.rec);
+  const hasConflict = item.docCode !== '—' && recommended && item.docCode !== recommended.code;
+  let agskHtml = '';
+  if (hasConflict) {
+    agskHtml += `<div class="agsk-source-row">
+      ⚠ Код в документе: <strong>${item.docCode}</strong> — не совпадает с подобранным системой
+    </div>`;
+  }
+  const currentSelected = selectedCodes[id];
+  agskHtml += `<div class="agsk-options">` + item.agsk.map(a => `
+    <label class="agsk-option ${(currentSelected === a.code || (!currentSelected && a.rec)) ? 'selected' : ''}">
+      <input type="radio" name="agsk_${id}" value="${a.code}"
+        ${(currentSelected === a.code || (!currentSelected && a.rec)) ? 'checked' : ''}
+        onchange="selectAgsk(${id}, '${a.code}', this.closest('.agsk-option'))">
+      <div>
+        <div class="agsk-option-code">${a.code}${a.rec ? '<span class="agsk-recommended">рекомендован</span>' : ''}</div>
+        <div class="agsk-option-name">${a.name}</div>
+      </div>
+    </label>`).join('') + `</div>`;
+  document.getElementById('modalAgsk').innerHTML = agskHtml;
+
+  // analog
+  const analogMap = {
+    yes:  { cls: 'analog-yes',  icon: '✓', text: 'Отечественный аналог найден в реестре КТП/СТ-КЗ' },
+    no:   { cls: 'analog-no',   icon: '✗', text: 'Аналог не найден в реестре по выбранному коду АГСК' },
+    warn: { cls: 'analog-warn', icon: '⚠', text: 'Система не уверена — требуется ручная проверка в реестре' },
+  };
+  const a = analogMap[item.analog];
+  document.getElementById('modalAnalog').innerHTML =
+    `<div class="analog-result ${a.cls}">${a.icon} ${a.text}</div>`;
+
+  document.getElementById('modalSource').innerHTML =
+    `📍 Источник: строка ${40 + item.id * 11}, страница ${Math.ceil(item.id / 3)} исходного документа`;
+
+  document.getElementById('modal').dataset.itemId = id;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function selectAgsk(itemId, code, el) {
+  el.closest('.agsk-options').querySelectorAll('.agsk-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCodes[itemId] = code;
+}
+
+function saveSelection() {
+  const id = parseInt(document.getElementById('modal').dataset.itemId);
+  closeModalDirect();
+  renderTable(ITEMS.filter(i => {
+    if (currentFilter === 'all') return true;
+    return i.analog === currentFilter;
+  }));
+  showToast('Выбор кода АГСК сохранён');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+/* ─── UTILS ─── */
+function downloadExcel() {
+  showToast('Файл smeta_proekt_energetika_результат_09.09.2026.xlsx скачан');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+/* ─── DRAG & DROP (visual only) ─── */
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  dz.classList.remove('drag-over');
+  simulateFileChosen();
+});
+</script>
+</body>
+</html>

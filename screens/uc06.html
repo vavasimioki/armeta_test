@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"/><style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#1a56db;--blue-l:#e8f0fe;--green:#0e9f6e;--green-l:#f0fdf4;--red:#e02424;--red-l:#fef2f2;--yellow:#c27803;--yellow-l:#fffbeb;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g500:#6b7280;--g700:#374151;--g900:#111827}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--g50)}
+nav{background:#fff;border-bottom:1px solid var(--g200);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{width:32px;height:32px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+.nav-title{font-weight:600;font-size:15px}
+.nav-ver{font-size:11px;color:var(--g500);background:var(--g100);padding:2px 8px;border-radius:20px}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.hdr h2{font-size:17px;font-weight:600}
+.hdr p{font-size:13px;color:var(--g500)}
+.actions{display:flex;gap:10px}
+.btn{padding:9px 18px;border-radius:6px;font-size:13px;font-weight:600;border:none;cursor:pointer}
+.btn-b{background:transparent;color:var(--blue);border:1px solid var(--blue)}
+.btn-s{background:#fff;color:var(--g700);border:1px solid var(--g300)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat{background:#fff;border:1px solid var(--g200);border-radius:8px;padding:16px 20px}
+.stat .n{font-size:28px;font-weight:700;line-height:1}
+.stat .l{font-size:12px;color:var(--g500);margin-top:4px}
+.stat.all .n{color:var(--g900)}.stat.yes .n{color:var(--green)}.stat.no .n{color:var(--red)}.stat.wrn .n{color:var(--yellow)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--g900);color:#fff;padding:14px 20px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 10px 25px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px}
+.tbl-wrap{background:#fff;border:1px solid var(--g200);border-radius:8px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--g50);padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--g200)}
+tbody td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--g100)}
+tbody tr:last-child td{border-bottom:none}
+.b{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.b-y{background:var(--green-l);color:var(--green)}.b-n{background:var(--red-l);color:var(--red)}
+.agsk-code{font-size:12px;font-weight:600;color:var(--g700)}
+.col-reserved{color:var(--g300);font-style:italic;font-size:12px}
+</style></head><body>
+<nav><div class="nav-brand"><div class="nav-logo">КЗ</div><span class="nav-title">КЗ-Анализ Смет</span></div><span class="nav-ver">v1.0-pilot</span></nav>
+<div class="wrap">
+  <div class="hdr">
+    <div><h2>📄 smeta_proekt_energetika.pdf</h2><p>09.09.2026 14:32 · PDF-скан</p></div>
+    <div class="actions"><button class="btn btn-b" style="background:var(--blue-l)">⬇ Скачать Excel</button><button class="btn btn-s">＋ Новый файл</button></div>
+  </div>
+  <div class="stats">
+    <div class="stat all"><div class="n">247</div><div class="l">Товаров найдено</div></div>
+    <div class="stat yes"><div class="n">184</div><div class="l">Есть аналог КЗ</div></div>
+    <div class="stat no"><div class="n">41</div><div class="l">Нет аналога</div></div>
+    <div class="stat wrn"><div class="n">22</div><div class="l">Требуют проверки</div></div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Наименование</th><th>Кол-во</th><th>Ед.</th><th>Код АГСК</th><th>Аналог КЗ</th><th style="color:#c0c8d8">▸ Работы (фаза 2)</th><th style="color:#c0c8d8">▸ Услуги (фаза 3)</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:500">Кабель ВВГ 3х2.5</td><td>150</td><td>м</td><td><span class="agsk-code">27.32.10.110</span></td><td><span class="b b-y">✓ ДА</span></td><td class="col-reserved">—</td><td class="col-reserved">—</td></tr>
+        <tr><td style="font-weight:500">Трансформатор ТМГ-630</td><td>2</td><td>шт</td><td><span class="agsk-code">27.11.32.400</span></td><td><span class="b b-n">✗ НЕТ</span></td><td class="col-reserved">—</td><td class="col-reserved">—</td></tr>
+        <tr><td style="font-weight:500">Насос ЦНС 60-99</td><td>1</td><td>шт</td><td><span class="agsk-code">28.13.12.210</span></td><td><span class="b b-y">✓ ДА</span></td><td class="col-reserved">—</td><td class="col-reserved">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="toast">✓ Файл <strong style="margin:0 4px">smeta_energetika_результат_09.09.2026.xlsx</strong> скачан</div>
+</body></html>
